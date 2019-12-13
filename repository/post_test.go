@@ -4,9 +4,17 @@ import (
 	"database/sql"
 	"reflect"
 	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
 )
 
 func TestRepositoryFetchEntries(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
 	type fields struct {
 		db *sql.DB
 	}
@@ -21,7 +29,7 @@ func TestRepositoryFetchEntries(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &repository{
-				db: tt.fields.db,
+				db: db,
 			}
 			got, err := s.FetchEntries()
 			if (err != nil) != tt.wantErr {
