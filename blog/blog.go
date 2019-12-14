@@ -6,16 +6,16 @@ import (
 	"github.com/Alkemic/gowroc-di-project/repository"
 )
 
-type postRepository interface {
-	FetchEntries() ([]repository.Post, error)
-	GetEntry(id int) (repository.Post, error)
+type BlogService interface {
+	List() ([]repository.Post, error)
+	Get(id int) (repository.Post, error)
 }
 
 type blogService struct {
-	postRepository postRepository
+	postRepository repository.PostRepository
 }
 
-func NewBlogService(postRepository postRepository) *blogService {
+func NewBlogService(postRepository repository.PostRepository) BlogService {
 	return &blogService{
 		postRepository: postRepository,
 	}

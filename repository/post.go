@@ -13,17 +13,22 @@ type Post struct {
 	CreatedAt time.Time
 }
 
-type repository struct {
+type PostRepository interface {
+	FetchEntries() ([]Post, error)
+	GetEntry(id int) (Post, error)
+}
+
+type postRepository struct {
 	db *sql.DB
 }
 
-func NewRepository(db *sql.DB) *repository {
-	return &repository{
+func NewRepository(db *sql.DB) PostRepository {
+	return &postRepository{
 		db: db,
 	}
 }
 
-func (s repository) FetchEntries() ([]Post, error) {
+func (s postRepository) FetchEntries() ([]Post, error) {
 	entries := []Post{}
 	rows, err := s.db.Query(`SELECT * FROM posts;`)
 	if err != nil {
@@ -42,7 +47,7 @@ func (s repository) FetchEntries() ([]Post, error) {
 	return entries, nil
 }
 
-func (s repository) GetEntry(id int) (Post, error) {
+func (s postRepository) GetEntry(id int) (Post, error) {
 	entry := Post{}
 	row := s.db.QueryRow(`SELECT * FROM posts WHERE id = ?;`, id)
 	err := row.Scan(&entry.Id, &entry.Title, &entry.Content, &entry.CreatedAt)

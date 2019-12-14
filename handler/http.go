@@ -6,19 +6,18 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Alkemic/gowroc-di-project/repository"
+	"github.com/Alkemic/gowroc-di-project/blog"
 )
 
-type blogService interface {
-	List() ([]repository.Post, error)
-	Get(id int) (repository.Post, error)
-}
-
 type httpHandler struct {
-	blogService blogService
+	blogService blog.BlogService
 }
 
-func NewHandler(blogService blogService) http.Handler {
+type HttpHandler interface {
+	ServeHTTP(http.ResponseWriter, *http.Request)
+}
+
+func NewHandler(blogService blog.BlogService) HttpHandler {
 	h := &httpHandler{blogService: blogService}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/posts", h.listEntriesHandler)
